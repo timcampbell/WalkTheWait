@@ -1,0 +1,44 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Walk the Wait</h1>
+    <select id="sel_park" asp-items="Model.parkOptions"></select>
+    <button onclick="getRandomWaitTime()">Get random wait time</button>
+</div>
+
+
+<script>
+    function getRandomWaitTime() {
+        jQuery.support.cors = true;
+        $.ajax ({
+            url: 'https://queue-times.com/parks/'+sel_park.value+'/queue_times.json',
+            datatype: "json",
+            success: function (parkObj) {
+                var rideTimes = [];
+                for(var landIndex = 0; landIndex < parkObj["lands"].length; landIndex++)
+                {
+                    var land = parkObj["lands"][landIndex];
+                    for(var rideIndex = 0; rideIndex < land["rides"].length; rideIndex++)
+                    {
+                        var ride = land["rides"][rideIndex];
+
+                        rideTimes.push([ride["name"], ride["wait_time"]])
+                    }
+                }
+                for(var rideIndex = 0; rideIndex < parkObj["rides"].length; rideIndex++)
+                {
+                    var ride = parkObj["rides"][rideIndex];
+
+                    rideTimes.push([ride["name"], ride["wait_time"]])
+                }
+
+                var rand = Math.floor(Math.random() * rideTimes.length);
+
+                alert(rideTimes[rand][0] + ': ' + rideTimes[rand][1] + ' Minutes');
+            }})
+    }
+</script>
